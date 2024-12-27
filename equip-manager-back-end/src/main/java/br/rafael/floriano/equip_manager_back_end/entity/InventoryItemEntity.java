@@ -9,7 +9,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 @Entity
-@NoArgsConstructor
 @Table(name = "inventory_item")
 public class InventoryItemEntity {
 
@@ -47,6 +46,8 @@ public class InventoryItemEntity {
         this.disponibilidade = Disponibilidade.DISPONIVEL;
         this.localizacao = localizacao;
     }
+
+    public InventoryItemEntity() {}
 
     @PrePersist
     void PrePersist() {
