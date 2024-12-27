@@ -8,8 +8,9 @@ import br.rafael.floriano.equip_manager_back_end.repository.ItemInventarioReposi
 import br.rafael.floriano.equip_manager_back_end.services.validadores.CodigoItemValidadorService;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.DescricaoItemValidadorService;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.LocalizacaoItemValidadorService;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,6 +47,13 @@ public class ItemInventarioService {
         localizacaoItemValidadorService.localizacaoItemIsValid(itemInventarioDto.localizacao());
     }
 
+    public Page<ItemVisualizacaoDto> buscaPagina(int paginaAtual) {
+        return itemInventarioMapper.toDtoPagination(
+                itemInventarioRepository.findAll(
+                        PageRequest.of(paginaAtual,15)
+                )
+        );
+    }
 
 
 }
