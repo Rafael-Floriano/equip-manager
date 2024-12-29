@@ -3,7 +3,6 @@ package br.rafael.floriano.equip_manager_back_end.entity;
 import br.rafael.floriano.equip_manager_back_end.enums.Disponibilidade;
 import br.rafael.floriano.equip_manager_back_end.enums.Status;
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;

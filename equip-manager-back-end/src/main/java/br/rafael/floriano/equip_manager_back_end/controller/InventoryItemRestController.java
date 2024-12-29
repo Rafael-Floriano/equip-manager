@@ -28,4 +28,14 @@ public class InventoryItemRestController {
         return itemInventarioService.buscaPagina(paginaAtual);
     }
 
+    @DeleteMapping("/{id}")
+    public void deletar(@PathVariable("id") String codigoItem) {
+        itemInventarioService.deletar(codigoItem);
+    }
+
+    @PutMapping
+    public void deletar(@RequestBody ItemInventarioDto itemInventarioDto) {
+        itemInventarioService.deletar(itemInventarioDto);
+    }
+
 }

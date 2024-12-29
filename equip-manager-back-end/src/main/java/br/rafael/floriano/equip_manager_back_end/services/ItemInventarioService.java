@@ -8,6 +8,7 @@ import br.rafael.floriano.equip_manager_back_end.repository.ItemInventarioReposi
 import br.rafael.floriano.equip_manager_back_end.services.validadores.CodigoItemValidadorService;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.DescricaoItemValidadorService;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.LocalizacaoItemValidadorService;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,5 +56,16 @@ public class ItemInventarioService {
         );
     }
 
+    public void deletar(final String codigoItem) {
+        if (codigoItem == null || codigoItem.isBlank()) {
+            throw new IllegalArgumentException("Deve ser informado o código do item para realizar a exclução do mesmo");
+        }
+        itemInventarioRepository.setStatusEqualsInativo(codigoItem);
+    }
+
+    public ItemVisualizacaoDto atualizar(final ItemInventarioDto itemInventarioDto) {
+        defaultValidations(itemInventarioDto);
+
+    }
 
 }
