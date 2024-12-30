@@ -8,11 +8,12 @@ import br.rafael.floriano.equip_manager_back_end.repository.ItemInventarioReposi
 import br.rafael.floriano.equip_manager_back_end.services.validadores.CodigoItemValidadorService;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.DescricaoItemValidadorService;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.LocalizacaoItemValidadorService;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import static br.rafael.floriano.equip_manager_back_end.enums.MensagensDeErro.CODIGO_ITEM_JA_ESTA_EM_USO;
 
 @Service
 public class ItemInventarioService {
@@ -30,11 +31,13 @@ public class ItemInventarioService {
 
     public ItemVisualizacaoDto criarItemInventario(ItemInventarioDto itemInventarioDto) {
         defaultValidations(itemInventarioDto);
+        if (existeItemComCodigo(itemInventarioDto.codigoItem())) {
+            throw new IllegalArgumentException(CODIGO_ITEM_JA_ESTA_EM_USO.getMessage());
+        }
         return itemInventarioMapper.toDto(
                 itemInventarioRepository.save(
                         new InventoryItemEntity(
                                 itemInventarioDto.codigoItem(),
-                                itemInventarioDto.numeroDeSerie(),
                                 itemInventarioDto.descricao(),
                                 itemInventarioDto.localizacao()
                         )
@@ -71,8 +74,9 @@ public class ItemInventarioService {
         itemInventarioRepository.setStatusEqualsInativo(codigoItem);
     }
 
-    public ItemVisualizacaoDto atualizar(final ItemInventarioDto itemInventarioDto) {
-        defaultValidations(itemInventarioDto);
+    public boolean existeItemComCodigo(String codigoItem) {
+        return itemInventarioRepository.existsByCodigoItem(codigoItem);
+    }
 
     }
 
