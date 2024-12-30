@@ -11,11 +11,13 @@ import java.time.LocalDateTime;
 @Table(name = "inventory_item")
 public class InventoryItemEntity {
 
-    @Id
     @Column(name = "codigo_item", unique = true, length = 7)
     private String codigoItem;
 
-    @Column(name = "numero_de_serie", nullable = false, length = 5)
+    @Id
+    @GeneratedValue(generator = "custom-id", strategy = GenerationType.IDENTITY)
+    @GenericGenerator(name = "custom-id", strategy = "br.rafael.floriano.equip_manager_back_end.entity.CustomIdGenerator")
+    @Column(name = "numero_de_serie", length = 5, updatable = false, insertable = false)
     private String numeroDeSerie;
 
     @Enumerated(EnumType.STRING)
