@@ -78,6 +78,10 @@ public class ItemInventarioService {
         return itemInventarioRepository.existsByCodigoItem(codigoItem);
     }
 
-    }
+
+//    public ItemVisualizacaoDto atualizar(final ItemInventarioDto itemInventarioDto) {
+//        defaultValidations(itemInventarioDto);
+//
+//    }
 
 }
