@@ -3,8 +3,7 @@ import SearchWithPagination from '@/components/organisms/SearchWithPagination.vu
 import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
-  { path: '/', name: 'Home', component: HelloWorld },
-  { path: '/search', name: 'Search', component: SearchWithPagination },
+  { path: '/', name: 'Search', component: SearchWithPagination },
 ];
 
 const router = createRouter({
