@@ -4,8 +4,7 @@ import SearchWithPagination from '@/components/organisms/SearchWithPagination.vu
 import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
-  { path: '/', name: 'Search', component: SearchWithPagination },
-  { path: '/form', name: 'Cadastro de item', component: InventoryItemform },
+  { path: '/', name: 'Search', component: SearchWithPagination }
 ];
 
 const router = createRouter({
