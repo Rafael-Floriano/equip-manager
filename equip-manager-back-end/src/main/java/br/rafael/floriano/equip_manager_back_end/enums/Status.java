@@ -7,8 +7,12 @@ public enum Status {
 
     private char valor;
 
-    Status(final char valor) {
+    Status(char valor) {
         this.valor = valor;
+    }
+
+    public char getValue() {
+        return valor;
     }
 
 }
