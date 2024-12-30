@@ -30,8 +30,8 @@ public class InventoryItemRestController {
     }
 
     @DeleteMapping("/{id}")
-    public void deletar(@PathVariable("id") String codigoItem) {
-        itemInventarioService.deletar(codigoItem);
+    public void deletar(@PathVariable("id") String numeroDeSerie) {
+        itemInventarioService.deletar(numeroDeSerie);
     }
 //
 //    @PutMapping
