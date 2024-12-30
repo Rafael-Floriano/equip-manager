@@ -79,18 +79,21 @@
     @close="closeEditModal" 
     @save="updateItem" 
   />
+
+  <ScrollToTopButton/>
 </template>
 
 
 <script lang="ts">
 import { InventoryItem, InventoryResponse } from '@/types/pagination.types';
 import SearchInput from '../molecules/SearchInput.vue';
-import { fetchInventoryItems } from '@/services/inventoryService';
+import { deleteItemPeloNumeroDeSerie, fetchInventoryItems } from '@/services/inventoryService';
 import { defineComponent } from 'vue';
 import { debounce } from 'lodash';
 import ConfirmationDialog from '../molecules/ConfirmationDialog.vue';
 import ItemDetailsModal from '../molecules/ItemDetailsModal.vue';
 import EditItemModal from '../molecules/EditItemModal.vue';
+import ScrollToTopButton from '../atoms/ScrollToTopButton.vue';
 
 export default defineComponent({
   components: {
@@ -98,11 +101,12 @@ export default defineComponent({
     ConfirmationDialog,
     ItemDetailsModal,
     EditItemModal,
+    ScrollToTopButton,
   },
   data() {
     return {
       searchQuery: '',
-      statusFilter: '',  // Novo filtro para Ativo/Inativo
+      statusFilter: '', 
       items: [] as InventoryItem[],
       currentPage: 0,
       itemsPerPage: 5,
@@ -157,8 +161,8 @@ export default defineComponent({
     },
 
     deleteItem(item: InventoryItem): void {
-      console.log("deleteItem:", item);
       this.itemToDelete = item;
+      this.deletarItemSelecionado();
       this.isDialogVisible = true;
     },
 
@@ -189,6 +193,19 @@ export default defineComponent({
       }
     },
 
+    async deletarItemSelecionado(): Promise<void> {
+      try {
+        this.loading = true;
+        await deleteItemPeloNumeroDeSerie(this.itemToDelete?.numeroDeSerie);
+        this.items = this.items.filter(item => item.numeroDeSerie !== this.itemToDelete?.numeroDeSerie);
+        this.items
+      } catch (error) {
+        console.error('Erro ao buscar itens do inventário:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
     temResultadoVazio(): boolean {
       return (this.items == null || this.items.length == 0) && !this.loading;
     },
@@ -204,6 +221,7 @@ export default defineComponent({
     const listElement = this.$refs.itemList as HTMLElement;
       if (listElement) {
         const { scrollTop, scrollHeight, clientHeight } = listElement;
+        console.log("handleScroll: ", scrollTop, scrollHeight, clientHeight);
         if (scrollTop + clientHeight >= scrollHeight - 10 && !this.loading && !this.lastPage) {
           this.currentPage += 1;
           this.fetchItems();
@@ -229,14 +247,18 @@ export default defineComponent({
     this.fetchItems();
     const listElement = this.$refs.itemList as HTMLElement;
     if (listElement) {
-      listElement.addEventListener('scroll', this.handleScroll);
+      window.addEventListener('scroll', this.handleScroll);
     }
   },
   beforeUnmount() {
     const listElement = this.$refs.itemList as HTMLElement;
     if (listElement) {
-      listElement.removeEventListener('scroll', this.handleScroll);
+      window.removeEventListener('scroll', this.handleScroll);
     }
   },
 });
 </script>
+
+<style>
+
+</style>
