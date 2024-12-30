@@ -17,7 +17,7 @@ public class InventoryItemRestController {
     }
 
     @PostMapping
-    public ItemVisualizacaoDto create(ItemInventarioDto itemInventarioDto) {
+    public ItemVisualizacaoDto create(@RequestBody ItemInventarioDto itemInventarioDto) {
         return itemInventarioService.criarItemInventario(
                 itemInventarioDto
         );
@@ -33,10 +33,10 @@ public class InventoryItemRestController {
     public void deletar(@PathVariable("id") String codigoItem) {
         itemInventarioService.deletar(codigoItem);
     }
-
-    @PutMapping
-    public void deletar(@RequestBody ItemInventarioDto itemInventarioDto) {
-        itemInventarioService.deletar(itemInventarioDto);
-    }
+//
+//    @PutMapping
+//    public void deletar(@RequestBody ItemInventarioDto itemInventarioDto) {
+//        itemInventarioService.deletar(itemInventarioDto);
+//    }
 
 }
