@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static br.rafael.floriano.equip_manager_back_end.enums.MensagensDeErro.CODIGO_ITEM_JA_ESTA_EM_USO;
 
@@ -55,23 +56,24 @@ public class ItemInventarioService {
         if (descricao == null || descricao.isBlank()) {
             return itemInventarioMapper.toDtoPagination(
                     itemInventarioRepository.findAll(
-                            PageRequest.of(pagina,8)
+                            PageRequest.of(pagina,12)
                     )
             );
         }
         return itemInventarioMapper.toDtoPagination(
                 itemInventarioRepository.findAllByDescricaoContainingIgnoreCase(
                         descricao,
-                        PageRequest.of(pagina,8)
+                        PageRequest.of(pagina,12)
                 )
         );
     }
 
-    public void deletar(final String codigoItem) {
-        if (codigoItem == null || codigoItem.isBlank()) {
+    @Transactional(rollbackFor = Exception.class)
+    public void deletar(final String numeroDeSerie) {
+        if (numeroDeSerie == null || numeroDeSerie.isBlank()) {
             throw new IllegalArgumentException("Deve ser informado o código do item para realizar a exclução do mesmo");
         }
-        itemInventarioRepository.setStatusEqualsInativo(codigoItem);
+        itemInventarioRepository.softDeleteById(numeroDeSerie);
     }
 
     public boolean existeItemComCodigo(String codigoItem) {
