@@ -10,8 +10,9 @@ public enum MensagensDeErro {
     LOCALIZACAO_ITEM_TAMANHO_MINIMO("A localização não pode conter menos que 3 caracteres"),
     LOCALIZACAO_ITEM_TAMANHO_MAXIMO("A localização não pode conter mais que 250 caracteres"),
     CODIGO_ITEM_INVALIDO_DEVE_SER_ALFANUMERICO("O código do item deve ser alfanumérico"),
-    CODIGO_ITEM_INVALIDO_DEVE_TER_SETE_CARACTERS("O código do item deve ter no máximo 7 caracteres"),
-    CODIGO_ITEM_INVALIDO_NAO_PODE_SER_SEQUENCIAL("O código do item não pode ser sequencial");
+    CODIGO_ITEM_INVALIDO_DEVE_TER_SETE_CARACTERS("O código do item deve conter 7 caracteres"),
+    CODIGO_ITEM_INVALIDO_NAO_PODE_SER_SEQUENCIAL("O código do item não pode ser sequencial"),
+    CODIGO_ITEM_JA_ESTA_EM_USO("O código informado já está em uso por outro item");
 
     private final String message;
 
