@@ -23,9 +23,10 @@ public class InventoryItemRestController {
         );
     }
 
-    @GetMapping("/all/{paginaAtual}")
-    public Page<ItemVisualizacaoDto> getPagination(@PathVariable(name = "paginaAtual") Integer paginaAtual) {
-        return itemInventarioService.buscaPagina(paginaAtual);
+    @GetMapping
+    public Page<ItemVisualizacaoDto> getPagination(@RequestParam(name = "pagina", defaultValue = "0") Integer pagina,
+                                                   @RequestParam(name = "descricao", required = false) String descricao) {
+        return itemInventarioService.buscaPagina(descricao, pagina);
     }
 
     @DeleteMapping("/{id}")
