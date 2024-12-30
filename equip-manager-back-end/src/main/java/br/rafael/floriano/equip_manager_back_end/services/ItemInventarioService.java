@@ -48,10 +48,18 @@ public class ItemInventarioService {
         localizacaoItemValidadorService.localizacaoItemIsValid(itemInventarioDto.localizacao());
     }
 
-    public Page<ItemVisualizacaoDto> buscaPagina(int paginaAtual) {
+    public Page<ItemVisualizacaoDto> buscaPagina(String descricao, int pagina) {
+        if (descricao == null || descricao.isBlank()) {
+            return itemInventarioMapper.toDtoPagination(
+                    itemInventarioRepository.findAll(
+                            PageRequest.of(pagina,8)
+                    )
+            );
+        }
         return itemInventarioMapper.toDtoPagination(
-                itemInventarioRepository.findAll(
-                        PageRequest.of(paginaAtual,15)
+                itemInventarioRepository.findAllByDescricaoContainingIgnoreCase(
+                        descricao,
+                        PageRequest.of(pagina,8)
                 )
         );
     }
