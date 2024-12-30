@@ -5,10 +5,14 @@ public enum Disponibilidade {
     DISPONIVEL('D'),
     INDISPONIVEL('I');
 
-    private char value;
+    private char valor;
 
-    Disponibilidade(final char value) {
-        this.value = value;
+    Disponibilidade(char valor) {
+        this.valor = valor;
+    }
+
+    public char getValue() {
+        return valor;
     }
 
 }
