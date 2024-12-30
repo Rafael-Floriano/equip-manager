@@ -1,9 +1,11 @@
 import HelloWorld from '@/components/molecules/HelloWorld.vue';
+import InventoryItemform from '@/components/organisms/InventoryItemform.vue';
 import SearchWithPagination from '@/components/organisms/SearchWithPagination.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
   { path: '/', name: 'Search', component: SearchWithPagination },
+  { path: '/form', name: 'Cadastro de item', component: InventoryItemform },
 ];
 
 const router = createRouter({
