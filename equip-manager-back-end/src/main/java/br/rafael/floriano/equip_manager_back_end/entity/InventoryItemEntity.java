@@ -3,6 +3,7 @@ package br.rafael.floriano.equip_manager_back_end.entity;
 import br.rafael.floriano.equip_manager_back_end.enums.Disponibilidade;
 import br.rafael.floriano.equip_manager_back_end.enums.Status;
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -20,11 +21,11 @@ public class InventoryItemEntity {
     @Column(name = "numero_de_serie", length = 5, updatable = false, insertable = false)
     private String numeroDeSerie;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = DisponibilidadeConverter.class)
     @Column(nullable = false)
     private Disponibilidade disponibilidade;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = StatusConverter.class)
     @Column(nullable = false)
     private Status status;
 
@@ -38,9 +39,8 @@ public class InventoryItemEntity {
     @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime dataMovimentacao;
 
-    public InventoryItemEntity(String codigoItem, String numeroDeSerie, String descricao, String localizacao) {
+    public InventoryItemEntity(String codigoItem, String descricao, String localizacao) {
         this.codigoItem = codigoItem;
-        this.numeroDeSerie = numeroDeSerie;
         this.descricao = descricao;
         this.dataMovimentacao = LocalDateTime.now();
         this.status = Status.ATIVO;
@@ -87,4 +87,5 @@ public class InventoryItemEntity {
     public LocalDateTime getDataMovimentacao() {
         return dataMovimentacao;
     }
+
 }
