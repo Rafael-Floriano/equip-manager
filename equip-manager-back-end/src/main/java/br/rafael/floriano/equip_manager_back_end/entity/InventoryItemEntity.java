@@ -4,6 +4,7 @@ import br.rafael.floriano.equip_manager_back_end.enums.Disponibilidade;
 import br.rafael.floriano.equip_manager_back_end.enums.Status;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -39,6 +40,9 @@ public class InventoryItemEntity {
     @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime dataMovimentacao;
 
+    @Column(nullable = false)
+    private Boolean excluido;
+
     public InventoryItemEntity(String codigoItem, String descricao, String localizacao) {
         this.codigoItem = codigoItem;
         this.descricao = descricao;
@@ -53,11 +57,17 @@ public class InventoryItemEntity {
     @PrePersist
     void PrePersist() {
         this.dataMovimentacao = LocalDateTime.now();
+        if (excluido == null) {
+            excluido = false;
+        }
     }
 
     @PreUpdate
     void preUpdate() {
         this.dataMovimentacao = LocalDateTime.now();
+        if (excluido == null) {
+            excluido = false;
+        }
     }
 
     public String getCodigoItem() {
