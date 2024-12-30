@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "inventory_item")
+@SQLRestriction("excluido = false")
 public class InventoryItemEntity {
 
     @Column(name = "codigo_item", unique = true, length = 7)
