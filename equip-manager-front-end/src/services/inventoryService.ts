@@ -31,3 +31,13 @@ export const salvarNovoItem = async(itemInventarioDto:ItemInventarioDto): Promis
 export default interface ResponseError {
   mensage:string
 }
+
+export const deleteItemPeloNumeroDeSerie = async(numeroDeSerie:String|undefined): Promise<any> => {
+  try {
+    const response = await axiosClient.delete<InventoryItem>(`/item/${numeroDeSerie}`);
+    return response.data;
+  } catch(error) {
+    console.error(error);
+    throw error;
+  }
+}
