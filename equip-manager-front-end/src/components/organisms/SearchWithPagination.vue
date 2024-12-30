@@ -2,20 +2,58 @@
   <div class="container my-5">
     <h1 class="mb-4">🗃️ Itens no inventário</h1>
 
-    <SearchInput v-model="searchQuery" @input="handleInput" />
-
-    <div v-if="loading" class="spinner-border text-primary" role="status">
+    <div class="d-flex align-items-center w-100 mb-3">
+      <div class="flex-grow-1 me-2">
+        <SearchInput v-model="searchQuery" @input="handleInput" class="w-100" />
+      </div>
+      <button 
+        type="button" 
+        class="btn btn-success">
+        Registrar um novo item
+      </button>
     </div>
+    
+    <table class="table table-striped table-bordered" ref="itemList">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Descrição</th>
+          <th>Disponibilidade</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr 
+          v-for="item in filteredItems" 
+          :key="item.codigoItem" 
+          :title="`Ver mais sobre o item: ${item.descricao}`"
+          @click="openModal(item)">
+          <td>{{ item.codigoItem }}</td>
+          <td>{{ item.descricao }}</td>
+          <td>{{ item.disponibilidade ? 'Disponível' : 'Indisponível' }}</td>
+          <td>{{ item.status }}</td>
+          <td>
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              @click.stop="editItem(item)" 
+              :title="`Editar Item: ${item.descricao}`">
+              <font-awesome-icon icon="pen" />
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-danger" 
+              @click.stop="deleteItem(item)"
+              :title="`Excluir Item: ${item.descricao}`">
+              <font-awesome-icon icon="trash" />
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-    <ul class="list-group mb-4" v-if="!loading" ref="itemList">
-      <li v-for="item in items" :key="item.codigoItem" class="list-group-item" style="display: flex; align-items: center; justify-content: space-between;">
-        {{ item.descricao }} 
-        <div style="display: flex; align-items: center; gap: 5px;">
-          <button type="button" class="btn btn-primary" @click="deleteItem(item)"><font-awesome-icon icon="pen" /></button>
-          <button type="button" class="btn btn-danger" @click="deleteItem(item)"><font-awesome-icon icon="trash" /></button>
-        </div>
-      </li>
-    </ul>
+    <div v-if="loading" class="spinner-border text-primary" role="status"></div>
 
     <div v-if="temResultadoVazio()">
       <p class="user-select-auto">Não encontramos resultados. Que tal tentar uma nova busca?</p>
@@ -28,7 +66,21 @@
       @confirm="confirmDelete"
       @cancel="cancelDelete"
     />
+
+  <ItemDetailsModal
+    v-if="showModal"
+    :item="selectedItem"
+    @close="closeModal"
+  />
+
+  <EditItemModal 
+    v-if="showEditModal" 
+    :item="selectedItem" 
+    @close="closeEditModal" 
+    @save="updateItem" 
+  />
 </template>
+
 
 <script lang="ts">
 import { InventoryItem, InventoryResponse } from '@/types/pagination.types';
@@ -37,15 +89,20 @@ import { fetchInventoryItems } from '@/services/inventoryService';
 import { defineComponent } from 'vue';
 import { debounce } from 'lodash';
 import ConfirmationDialog from '../molecules/ConfirmationDialog.vue';
+import ItemDetailsModal from '../molecules/ItemDetailsModal.vue';
+import EditItemModal from '../molecules/EditItemModal.vue';
 
 export default defineComponent({
   components: {
     SearchInput,
     ConfirmationDialog,
+    ItemDetailsModal,
+    EditItemModal,
   },
   data() {
     return {
       searchQuery: '',
+      statusFilter: '',  // Novo filtro para Ativo/Inativo
       items: [] as InventoryItem[],
       currentPage: 0,
       itemsPerPage: 5,
@@ -53,11 +110,44 @@ export default defineComponent({
       loading: false,
       lastPage: false,
       itemToDelete: null as InventoryItem | null,
-      isDialogVisible: false as Boolean
+      isDialogVisible: false as Boolean,
+      selectedItem: null as InventoryItem | null,
+      showModal: false,
+      showEditModal: false,
     };
   },
+  computed: {
+    filteredItems(): InventoryItem[] {
+      return this.items.filter(item => {
+        if (this.statusFilter === '') return true;
+        return item.status === this.statusFilter;
+      });
+    },
+  },
   methods: {
-
+    openModal(item: any) {
+      this.selectedItem = item;
+      this.showModal = true;
+    },
+    openEditItemModal(item: InventoryItem) {
+      this.selectedItem = item;
+      this.showEditModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
+    editItem(item: InventoryItem) {
+      this.openEditItemModal(item);
+    },
+    closeEditModal() {
+      this.showEditModal = false;
+    },
+    updateItem(updatedItem: InventoryItem) {
+      const index = this.items.findIndex(item => item.codigoItem === updatedItem.codigoItem);
+      if (index !== -1) {
+        this.items[index] = updatedItem;
+      }
+    },
     debouncedFetchItems(): void {
       const debounced = debounce(() => {
         this.fetchItems();
@@ -111,7 +201,7 @@ export default defineComponent({
     },
 
     handleScroll() {
-      const listElement = this.$refs.itemList as HTMLElement;
+    const listElement = this.$refs.itemList as HTMLElement;
       if (listElement) {
         const { scrollTop, scrollHeight, clientHeight } = listElement;
         if (scrollTop + clientHeight >= scrollHeight - 10 && !this.loading && !this.lastPage) {
@@ -120,23 +210,33 @@ export default defineComponent({
         }
       }
     },
+
+
+    handleStatusFilterChange() {
+      if (this.statusFilter) {
+        this.filteredItems = this.items.filter(
+          item => item.status.toLowerCase() === this.statusFilter.toLowerCase()
+        );
+      } else {
+        this.filteredItems = this.items;
+      }
+    },
   },
   created() {
     this.debouncedFetchItems = debounce(this.fetchItems, 500);
   },
   mounted() {
     this.fetchItems();
-    window.addEventListener('scroll', this.handleScroll);
+    const listElement = this.$refs.itemList as HTMLElement;
+    if (listElement) {
+      listElement.addEventListener('scroll', this.handleScroll);
+    }
   },
   beforeUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
+    const listElement = this.$refs.itemList as HTMLElement;
+    if (listElement) {
+      listElement.removeEventListener('scroll', this.handleScroll);
+    }
   },
 });
 </script>
-
-<style scoped>
-.list-group {
-  max-height: 500px;
-  overflow-y: auto;
-}
-</style>
