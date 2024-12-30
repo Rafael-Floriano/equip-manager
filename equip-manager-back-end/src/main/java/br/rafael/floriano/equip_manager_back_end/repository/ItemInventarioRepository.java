@@ -22,4 +22,8 @@ public interface ItemInventarioRepository extends JpaRepository<InventoryItemEnt
 
     boolean existsByCodigoItem(String codigoItem);
 
+    @Modifying
+    @Query("UPDATE InventoryItemEntity i SET i.excluido = true WHERE i.numeroDeSerie = :id")
+    void softDeleteById(@Param("id") String id);
+
 }
