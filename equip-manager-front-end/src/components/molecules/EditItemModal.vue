@@ -1,103 +1,122 @@
 <template>
-    <div class="modal-overlay" @click.self="close">
-      <div class="modal-content">
-        <h2>✏️ Editar Item</h2>
-        
-        <form @submit.prevent="saveChanges">
-          <div class="form-group">
-            <label for="codigoItem">🔢 Código:</label>
-            <input 
-              type="text" 
-              id="codigoItem" 
-              v-model="editableItem.codigoItem" 
-              class="form-control" 
-              readonly
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="numeroDeSerie">🔧 Número de Série:</label>
-            <input 
-              type="text" 
-              id="numeroDeSerie" 
-              v-model="editableItem.numeroDeSerie" 
-              class="form-control"
-              readonly
-            />
-          </div>
-  
-          <div class="form-group">
-            <label for="descricao">📝 Descrição:</label>
-            <input 
-              type="text" 
-              id="descricao" 
-              v-model="editableItem.descricao" 
-              class="form-control"
-            />
-          </div>
-  
-          <div class="form-group">
-            <label for="localizacao">📍 Localização:</label>
-            <input 
-              type="text" 
-              id="localizacao" 
-              v-model="editableItem.localizacao" 
-              class="form-control"
-            />
-          </div>
-  
-          <div class="form-group">
-            <label for="disponibilidade">📦 Disponibilidade:</label>
-            <select v-model="editableItem.disponibilidade" class="form-control">
-              <option :value="'D'">Disponível ✅</option>
-              <option :value="'I'">Indisponível ❌</option>
-            </select>
-          </div>
-  
-          <div class="form-group">
-            <label for="status">📊 Status:</label>
-            <select v-model="editableItem.status" class="form-control">
-              <option :value="'A'">Ativo ✅</option>
-              <option :value="'I'">Inativo ❌</option>
-            </select>
-          </div>
-  
-          <div class="form-group">
-            <button type="submit" class="btn btn-success">Salvar alterações</button>
-            <button type="button" class="btn btn-secondary" @click="close">Cancelar</button>
-          </div>
-        </form>
+  <div class="modal-overlay" @click.self="close">
+    <div class="modal-content">
+      <h2>✏️ Editar Item</h2>
+      
+      <div class="d-flex justify-content-center align-items-center mt-3">
+        <div v-if="loading" class="spinner-border text-primary" role="status"></div>
       </div>
+
+
+      <form v-if="editableItem" @submit.prevent="saveChanges">
+        <div class="form-group">
+          <label for="codigoItem">🔢 Código:</label>
+          <input 
+            type="text" 
+            id="codigoItem" 
+            v-model="editableItem.codigoItem" 
+            class="form-control" 
+            readonly
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="numeroDeSerie">🔧 Número de Série:</label>
+          <input 
+            type="text" 
+            id="numeroDeSerie" 
+            v-model="editableItem.numeroDeSerie" 
+            class="form-control"
+            readonly
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="descricao">📝 Descrição:</label>
+          <input 
+            type="text" 
+            id="descricao" 
+            v-model="editableItem.descricao" 
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="localizacao">📍 Localização:</label>
+          <input 
+            type="text" 
+            id="localizacao" 
+            v-model="editableItem.localizacao" 
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="disponibilidade">📦 Disponibilidade:</label>
+          <select v-model="editableItem.disponibilidade" class="form-control">
+            <option :value="'D'">Disponível ✅</option>
+            <option :value="'I'">Indisponível ❌</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="status">📊 Status:</label>
+          <select v-model="editableItem.status" class="form-control">
+            <option :value="'A'">Ativo ✅</option>
+            <option :value="'I'">Inativo ❌</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-success">Salvar alterações</button>
+          <button type="button" class="btn btn-secondary" @click="close">Cancelar</button>
+        </div>
+      </form>
     </div>
-  </template>
-  
-  <script lang="ts">
-  import { defineComponent, PropType } from 'vue';
-  import { InventoryItem } from '@/types/pagination.types';
-  
-  export default defineComponent({
-    props: {
-      item: {
-        type: Object as PropType<InventoryItem>,
-        required: true,
-      },
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, PropType } from 'vue';
+import { InventoryItem } from '@/types/pagination.types';
+import { fetchItemByNumeroDeSerie, putItemByNumeroDeSerie } from '@/services/inventoryService';
+
+export default defineComponent({
+  props: {
+    numeroDeSerie: {
+      type: String as PropType<string>,
+      required: true,
     },
-    data() {
-      return {
-        editableItem: { ...this.item },
-      };
+  },
+  data() {
+    return {
+      editableItem: null as InventoryItem | null,
+      loading: false as boolean,
+    };
+  },
+  methods: {
+    async saveChanges() {
+      console.log("saveChanges:", this.editableItem);
+      const item:InventoryItem = await putItemByNumeroDeSerie(this.numeroDeSerie, this.editableItem as ItemInventarioDto);
+      this.$emit('save', item);
+      this.close();
     },
-    methods: {
-      saveChanges() {
-        this.$emit('save', this.editableItem);
-        this.close();
-      },
-      close() {
-        this.$emit('close');
-      },
+    close() {
+      this.$emit('close');
     },
-  });
-  </script>
+    async onModalLoad() {
+      this.loading = true;
+      if (this.numeroDeSerie) {
+        this.editableItem = await fetchItemByNumeroDeSerie(this.numeroDeSerie);
+      }
+      this.loading = false;
+    },
+  },
+  mounted() {
+    this.onModalLoad();
+  },
+});
+</script>
   
   <style scoped>
   .modal-overlay {
