@@ -1,6 +1,7 @@
 package br.rafael.floriano.equip_manager_back_end.mapper;
 
 import br.rafael.floriano.equip_manager_back_end.dto.ItemVisualizacaoDto;
+import br.rafael.floriano.equip_manager_back_end.entity.DisponibilidadeConverter;
 import br.rafael.floriano.equip_manager_back_end.entity.InventoryItemEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,8 +16,8 @@ public class ItemInventarioMapper {
         return new ItemVisualizacaoDto(
                 inventoryItemEntity.getCodigoItem(),
                 inventoryItemEntity.getNumeroDeSerie(),
-                inventoryItemEntity.getDisponibilidade(),
-                inventoryItemEntity.getStatus(),
+                inventoryItemEntity.getDisponibilidade().getValue(),
+                inventoryItemEntity.getStatus().getValue(),
                 inventoryItemEntity.getDescricao(),
                 inventoryItemEntity.getLocalizacao()
         );
