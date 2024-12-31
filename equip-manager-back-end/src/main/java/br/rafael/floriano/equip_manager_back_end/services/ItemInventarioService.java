@@ -68,6 +68,12 @@ public class ItemInventarioService {
         );
     }
 
+    public ItemVisualizacaoDto buscarPorItemPeloNumeroDeSerie(String numeroDeSerie) {
+        return itemInventarioMapper.toDto(
+                itemInventarioRepository.findByNumeroDeSerie(numeroDeSerie).orElseThrow(IllegalArgumentException::new)
+        );
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void deletar(final String numeroDeSerie) {
         if (numeroDeSerie == null || numeroDeSerie.isBlank()) {
