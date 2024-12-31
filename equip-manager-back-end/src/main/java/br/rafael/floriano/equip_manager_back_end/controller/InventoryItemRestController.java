@@ -33,10 +33,15 @@ public class InventoryItemRestController {
     public void deletar(@PathVariable("id") String numeroDeSerie) {
         itemInventarioService.deletar(numeroDeSerie);
     }
-//
-//    @PutMapping
-//    public void deletar(@RequestBody ItemInventarioDto itemInventarioDto) {
-//        itemInventarioService.deletar(itemInventarioDto);
-//    }
+
+    @GetMapping("/{numeroDeSerie}")
+    public ItemVisualizacaoDto findItemInventarioByNumeroDeSerie(@PathVariable("numeroDeSerie") String numeroDeSerie) {
+        return itemInventarioService.buscarPorItemPeloNumeroDeSerie(numeroDeSerie);
+    }
+
+    @PutMapping
+    public ItemVisualizacaoDto atualizar(@RequestParam("numeroDeSerie") String numeroDeSerie, @RequestBody ItemInventarioDto itemInventarioDto) {
+        return itemInventarioService.atualizarItemPeloNumeroDeSerie(numeroDeSerie, itemInventarioDto);
+    }
 
 }
