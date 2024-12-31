@@ -44,7 +44,7 @@
             <button 
               type="button" 
               class="btn btn-danger" 
-              @click.stop="deleteItem(item)"
+              @click.stop="showdeletarItemConfirmModal(item)"
               :title="`Excluir Item: ${item.descricao}`">
               <font-awesome-icon icon="trash" />
             </button>
@@ -160,14 +160,14 @@ export default defineComponent({
       return debounced();
     },
 
-    deleteItem(item: InventoryItem): void {
+    showdeletarItemConfirmModal(item: InventoryItem): void {
       this.itemToDelete = item;
-      this.deletarItemSelecionado();
       this.isDialogVisible = true;
     },
 
     confirmDelete() {
       console.log('Deletando item:', this.itemToDelete);
+      this.deletarItemSelecionado();
       this.isDialogVisible = false;
     },
 
