@@ -8,6 +8,7 @@ import br.rafael.floriano.equip_manager_back_end.repository.ItemInventarioReposi
 import br.rafael.floriano.equip_manager_back_end.services.validadores.CodigoItemValidadorService;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.DescricaoItemValidadorService;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.LocalizacaoItemValidadorService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -86,10 +87,12 @@ public class ItemInventarioService {
         return itemInventarioRepository.existsByCodigoItem(codigoItem);
     }
 
-
-//    public ItemVisualizacaoDto atualizar(final ItemInventarioDto itemInventarioDto) {
-//        defaultValidations(itemInventarioDto);
-//
-//    }
+    public ItemVisualizacaoDto atualizarItemPeloNumeroDeSerie(final String numeroDeSerie, final ItemInventarioDto itemInventarioDto) {
+        InventoryItemEntity itemEntity = itemInventarioRepository.findByNumeroDeSerie(numeroDeSerie).orElseThrow(IllegalArgumentException::new);
+        BeanUtils.copyProperties(itemInventarioDto, itemEntity);
+        return itemInventarioMapper.toDto(
+                itemInventarioRepository.save(itemEntity)
+        );
+    }
 
 }
