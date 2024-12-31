@@ -31,8 +31,8 @@
           @click="openModal(item)">
           <td>{{ item.codigoItem }}</td>
           <td>{{ item.descricao }}</td>
-          <td>{{ item.disponibilidade ? 'Disponível' : 'Indisponível' }}</td>
-          <td>{{ item.status }}</td>
+          <td>{{ showDisponibilidade(item.disponibilidade) }}</td>
+          <td>{{ showStatus(item.status) }}</td>
           <td>
             <button 
               type="button" 
@@ -75,7 +75,7 @@
 
   <EditItemModal 
     v-if="showEditModal" 
-    :item="selectedItem" 
+    :numeroDeSerie="selectedItem?.numeroDeSerie" 
     @close="closeEditModal" 
     @save="updateItem" 
   />
@@ -239,6 +239,19 @@ export default defineComponent({
         this.filteredItems = this.items;
       }
     },
+
+    showDisponibilidade(disponibilidade:string):string {
+      if (disponibilidade === 'D') {
+        return 'Disponível';
+      }
+      return 'Indisponível';
+    },
+    showStatus(status:string):string {
+      if (status === 'A') {
+        return 'Ativo';
+      }
+      return 'Inativo';
+    }
   },
   created() {
     this.debouncedFetchItems = debounce(this.fetchItems, 500);
