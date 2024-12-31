@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ItemInventarioRepository extends JpaRepository<InventoryItemEntity, Long> {
 
@@ -25,5 +27,7 @@ public interface ItemInventarioRepository extends JpaRepository<InventoryItemEnt
     @Modifying
     @Query("UPDATE InventoryItemEntity i SET i.excluido = true WHERE i.numeroDeSerie = :id")
     void softDeleteById(@Param("id") String id);
+
+    Optional<InventoryItemEntity> findByNumeroDeSerie(String numeroDeSerie);
 
 }
