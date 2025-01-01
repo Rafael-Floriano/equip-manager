@@ -12,18 +12,15 @@ export const fetchInventoryItems = async (descricao:string, pagina:number): Prom
           });
       return response.data;
     } catch (error) {
-      console.error('Erro ao buscar itens do inventário:', error);
       throw error;
     }
 };
 
 export const salvarNovoItem = async(itemInventarioDto:ItemInventarioDto): Promise<any> => {
-  console.log(itemInventarioDto);
   try {
     const response = await axiosClient.post<InventoryItem>('/item', itemInventarioDto);
     return response.data;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
@@ -37,7 +34,6 @@ export const deleteItemPeloNumeroDeSerie = async(numeroDeSerie:String|undefined)
     const response = await axiosClient.delete<InventoryItem>(`/item/${numeroDeSerie}`);
     return response.data;
   } catch(error) {
-    console.error(error);
     throw error;
   }
 };
@@ -47,7 +43,6 @@ export const fetchItemByNumeroDeSerie = async (numeroDeSerie:String|undefined): 
     const response = await axiosClient.get<InventoryItem>(`/item/${numeroDeSerie}`);
     return response.data;
   } catch (error) {
-    console.error('Erro ao buscar itens do inventário:', error);
     throw error;
   }
 };
@@ -61,7 +56,6 @@ export const putItemByNumeroDeSerie = async (numeroDeSerie:String|undefined, ite
     });
     return response.data;
   } catch(error) {
-    console.error('Erro ao buscar itens do inventário:', error);
     throw error;
   }
 }

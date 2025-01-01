@@ -3,12 +3,13 @@
     <h1 class="mb-4">🗃️ Itens no inventário</h1>
 
     <div class="d-flex align-items-center w-100 mb-3">
-      <div class="flex-grow-1 me-2">
+      <div class="flex-grow-1 me-2 mr-3">
         <SearchInput v-model="searchQuery" @input="handleInput" class="w-100" />
       </div>
       <button 
         type="button" 
-        class="btn btn-success">
+        class="btn btn-success"
+        @click="showItemModal()">
         Registrar um novo item
       </button>
     </div>
@@ -73,13 +74,13 @@
     @close="closeModal"
   />
 
-  <EditItemModal 
+  <ItemModal 
     v-if="showEditModal" 
-    :numeroDeSerie="selectedItem?.numeroDeSerie" 
+    :numeroDeSerie="selectedItem?.numeroDeSerie"
+    :acaoModal="acaoModal"
     @close="closeEditModal" 
     @save="updateItem" 
   />
-
   <ScrollToTopButton/>
 </template>
 
@@ -92,16 +93,16 @@ import { defineComponent } from 'vue';
 import { debounce } from 'lodash';
 import ConfirmationDialog from '../molecules/ConfirmationDialog.vue';
 import ItemDetailsModal from '../molecules/ItemDetailsModal.vue';
-import EditItemModal from '../molecules/EditItemModal.vue';
+import ItemModal from '../molecules/ItemModal.vue';
 import ScrollToTopButton from '../atoms/ScrollToTopButton.vue';
 import $ from 'jquery';
-
+import { AcoesModal } from '@/constants/enums/AcoesModal';
 export default defineComponent({
   components: {
     SearchInput,
     ConfirmationDialog,
     ItemDetailsModal,
-    EditItemModal,
+    ItemModal,
     ScrollToTopButton,
   },
   data() {
@@ -120,6 +121,8 @@ export default defineComponent({
       showModal: false,
       showEditModal: false,
       qtdItensPorPagina: 12 as number,
+      showCreationItemModal: false as Boolean,
+      acaoModal: AcoesModal.cadastrar as AcoesModal,
     };
   },
   computed: {
@@ -131,12 +134,18 @@ export default defineComponent({
     },
   },
   methods: {
+    showItemModal():void {
+      this.acaoModal = AcoesModal.cadastrar;
+      this.showCreationItemModal = true;
+      this.showEditModal = true;
+    },
     openModal(item: any) {
       this.selectedItem = item;
       this.showModal = true;
     },
     openEditItemModal(item: InventoryItem) {
       this.selectedItem = item;
+      this.acaoModal = AcoesModal.editar;
       this.showEditModal = true;
     },
     closeModal() {
