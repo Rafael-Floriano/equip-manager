@@ -19,7 +19,8 @@ public class ItemInventarioMapper {
                 inventoryItemEntity.getDisponibilidade().getValue(),
                 inventoryItemEntity.getStatus().getValue(),
                 inventoryItemEntity.getDescricao(),
-                inventoryItemEntity.getLocalizacao()
+                inventoryItemEntity.getLocalizacao(),
+                inventoryItemEntity.getDataMovimentacao()
         );
     }
 
