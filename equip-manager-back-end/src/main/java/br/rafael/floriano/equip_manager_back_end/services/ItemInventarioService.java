@@ -3,6 +3,8 @@ package br.rafael.floriano.equip_manager_back_end.services;
 import br.rafael.floriano.equip_manager_back_end.dto.ItemInventarioDto;
 import br.rafael.floriano.equip_manager_back_end.dto.ItemVisualizacaoDto;
 import br.rafael.floriano.equip_manager_back_end.entity.InventoryItemEntity;
+import br.rafael.floriano.equip_manager_back_end.enums.Disponibilidade;
+import br.rafael.floriano.equip_manager_back_end.enums.Status;
 import br.rafael.floriano.equip_manager_back_end.mapper.ItemInventarioMapper;
 import br.rafael.floriano.equip_manager_back_end.repository.ItemInventarioRepository;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.CodigoItemValidadorService;
@@ -53,18 +55,18 @@ public class ItemInventarioService {
         localizacaoItemValidadorService.localizacaoItemIsValid(itemInventarioDto.localizacao());
     }
 
-    public Page<ItemVisualizacaoDto> buscaPagina(String descricao, int pagina) {
+    public Page<ItemVisualizacaoDto> buscaPagina(String descricao, int pagina, int qtdItens) {
         if (descricao == null || descricao.isBlank()) {
             return itemInventarioMapper.toDtoPagination(
                     itemInventarioRepository.findAll(
-                            PageRequest.of(pagina,12)
+                            PageRequest.of(pagina, qtdItens)
                     )
             );
         }
         return itemInventarioMapper.toDtoPagination(
                 itemInventarioRepository.findAllByDescricaoContainingIgnoreCase(
                         descricao,
-                        PageRequest.of(pagina,12)
+                        PageRequest.of(pagina, qtdItens)
                 )
         );
     }
@@ -89,7 +91,11 @@ public class ItemInventarioService {
 
     public ItemVisualizacaoDto atualizarItemPeloNumeroDeSerie(final String numeroDeSerie, final ItemInventarioDto itemInventarioDto) {
         InventoryItemEntity itemEntity = itemInventarioRepository.findByNumeroDeSerie(numeroDeSerie).orElseThrow(IllegalArgumentException::new);
-        BeanUtils.copyProperties(itemInventarioDto, itemEntity);
+        /*BeanUtils.copyProperties(itemInventarioDto, itemEntity);*/
+        itemEntity.setDescricao(itemInventarioDto.descricao());
+        itemEntity.setDisponibilidade(Disponibilidade.fromValueToEnum(itemInventarioDto.disponibilidade()));
+        itemEntity.setStatus(Status.fromValueToEnum(itemInventarioDto.status()));
+        itemEntity.setLocalizacao(itemInventarioDto.localizacao());
         return itemInventarioMapper.toDto(
                 itemInventarioRepository.save(itemEntity)
         );
