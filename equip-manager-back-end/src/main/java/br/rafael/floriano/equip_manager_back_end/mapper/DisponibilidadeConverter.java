@@ -1,4 +1,4 @@
-package br.rafael.floriano.equip_manager_back_end.entity;
+package br.rafael.floriano.equip_manager_back_end.mapper;
 
 import br.rafael.floriano.equip_manager_back_end.enums.Disponibilidade;
 import jakarta.persistence.AttributeConverter;
