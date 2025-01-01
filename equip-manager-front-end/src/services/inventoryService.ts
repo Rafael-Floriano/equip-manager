@@ -52,7 +52,7 @@ export const fetchItemByNumeroDeSerie = async (numeroDeSerie:String|undefined): 
   }
 };
 
-export const putItemByNumeroDeSerie = async (numeroDeSerie:String|undefined, itemInventarioDto:ItemInventarioDto): Promise<InventoryItem> => {
+export const putItemByNumeroDeSerie = async (numeroDeSerie:String|undefined, itemInventarioDto:InventoryItem | null): Promise<InventoryItem> => {
   try {
     const response = await axiosClient.put<InventoryItem>('/item', itemInventarioDto, {
       params: {
