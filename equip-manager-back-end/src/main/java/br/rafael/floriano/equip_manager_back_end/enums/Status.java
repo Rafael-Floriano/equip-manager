@@ -15,4 +15,13 @@ public enum Status {
         return valor;
     }
 
+    public static Status fromValueToEnum(char value) {
+        if (value == 'A') {
+            return ATIVO;
+        } else if (value == 'I') {
+            return INATIVO;
+        }
+        throw new IllegalArgumentException("Não foi informado um status compativel");
+    }
+
 }
