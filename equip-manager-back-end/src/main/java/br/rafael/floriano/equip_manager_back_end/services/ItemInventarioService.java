@@ -10,7 +10,6 @@ import br.rafael.floriano.equip_manager_back_end.repository.ItemInventarioReposi
 import br.rafael.floriano.equip_manager_back_end.services.validadores.CodigoItemValidadorService;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.DescricaoItemValidadorService;
 import br.rafael.floriano.equip_manager_back_end.services.validadores.LocalizacaoItemValidadorService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,21 +32,21 @@ public class ItemInventarioService {
     @Autowired
     private ItemInventarioMapper itemInventarioMapper;
 
-    public ItemVisualizacaoDto criarItemInventario(ItemInventarioDto itemInventarioDto) {
-        defaultValidations(itemInventarioDto);
-        if (existeItemComCodigo(itemInventarioDto.codigoItem())) {
-            throw new IllegalArgumentException(CODIGO_ITEM_JA_ESTA_EM_USO.getMessage());
+        public ItemVisualizacaoDto criarItemInventario(ItemInventarioDto itemInventarioDto) {
+            defaultValidations(itemInventarioDto);
+            if (existeItemComCodigo(itemInventarioDto.codigoItem())) {
+                throw new IllegalArgumentException(CODIGO_ITEM_JA_ESTA_EM_USO.getMessage());
+            }
+            return itemInventarioMapper.toDto(
+                    itemInventarioRepository.save(
+                            new InventoryItemEntity(
+                                    itemInventarioDto.codigoItem(),
+                                    itemInventarioDto.descricao(),
+                                    itemInventarioDto.localizacao()
+                            )
+                    )
+            );
         }
-        return itemInventarioMapper.toDto(
-                itemInventarioRepository.save(
-                        new InventoryItemEntity(
-                                itemInventarioDto.codigoItem(),
-                                itemInventarioDto.descricao(),
-                                itemInventarioDto.localizacao()
-                        )
-                )
-        );
-    }
 
     public void defaultValidations(final ItemInventarioDto itemInventarioDto) {
         codigoItemValidadorService.codigoItemIsValid(itemInventarioDto.codigoItem());
@@ -91,7 +90,6 @@ public class ItemInventarioService {
 
     public ItemVisualizacaoDto atualizarItemPeloNumeroDeSerie(final String numeroDeSerie, final ItemInventarioDto itemInventarioDto) {
         InventoryItemEntity itemEntity = itemInventarioRepository.findByNumeroDeSerie(numeroDeSerie).orElseThrow(IllegalArgumentException::new);
-        /*BeanUtils.copyProperties(itemInventarioDto, itemEntity);*/
         itemEntity.setDescricao(itemInventarioDto.descricao());
         itemEntity.setDisponibilidade(Disponibilidade.fromValueToEnum(itemInventarioDto.disponibilidade()));
         itemEntity.setStatus(Status.fromValueToEnum(itemInventarioDto.status()));
