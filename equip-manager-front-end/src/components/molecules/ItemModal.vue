@@ -59,21 +59,28 @@
           </select>
         </div>
         <div class="form-group">
-          <button type="submit" class="btn btn-success">Salvar alterações</button>
+          <button type="submit" class="btn btn-success">Salvar</button>
           <button type="button" class="btn btn-secondary" @click="close">Cancelar</button>
         </div>
       </form>
     </div>
   </div>
+
+  <AlertMessage v-if="showAlertModal" :mensagem="mensagemDeErro"/>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { InventoryItem } from '@/types/pagination.types';
-import { fetchItemByNumeroDeSerie, putItemByNumeroDeSerie } from '@/services/inventoryService';
+import { fetchItemByNumeroDeSerie, putItemByNumeroDeSerie, salvarNovoItem } from '@/services/inventoryService';
 import { AcoesModal } from '@/constants/enums/AcoesModal';
+import AlertMessage from './AlertMessage.vue';
+import { AxiosError } from 'axios';
 
 export default defineComponent({
+  components: {
+    AlertMessage,
+  },
   props: {
     numeroDeSerie: {
       type: String as PropType<string>,
@@ -95,19 +102,44 @@ export default defineComponent({
       status: ''
     } as InventoryItem,
     loading: false as boolean,
+    mensagemDeErro: '' as string,
+    showAlertModal: false as boolean,
     };
   },
   methods: {
     isEditMode(): boolean {
       return this.acaoModal === AcoesModal.editar;
     },
-    async saveChanges() {
-      const item:InventoryItem = await putItemByNumeroDeSerie(
-        this.numeroDeSerie, 
-        this.item
-      );
-      this.$emit('save', item);
-      this.close();
+    async saveChanges():Promise<any> {
+      try {
+        let item:InventoryItem;
+        if (this.isEditMode()) {
+          item = await putItemByNumeroDeSerie(
+            this.numeroDeSerie, 
+            this.item
+          );
+        } else {
+          item = await salvarNovoItem(
+            {
+              codigoItem: this.item.codigoItem,
+              numeroDeSerie: this.item.numeroDeSerie,
+              descricao: this.item.descricao,
+              localizacao: this.item.localizacao
+            }
+          );
+        }
+        this.$emit('save', item);
+        this.close();
+      } catch(error) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response && axiosError.response.data) {
+          this.mensagemDeErro = axiosError.response.data;
+        } else {
+          this.mensagemDeErro = 'Ocorreu um erro desconhecido.';
+        }
+        this.showAlertModal = true;
+      }
+
     },
     close() {
       this.item = {
