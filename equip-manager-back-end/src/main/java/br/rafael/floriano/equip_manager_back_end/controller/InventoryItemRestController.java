@@ -25,8 +25,9 @@ public class InventoryItemRestController {
 
     @GetMapping
     public Page<ItemVisualizacaoDto> getPagination(@RequestParam(name = "pagina", defaultValue = "0") Integer pagina,
-                                                   @RequestParam(name = "descricao", required = false) String descricao) {
-        return itemInventarioService.buscaPagina(descricao, pagina);
+                                                   @RequestParam(name = "descricao", required = false) String descricao,
+                                                   @RequestParam(name = "qtdItens", defaultValue = "12") int qtdItens) {
+        return itemInventarioService.buscaPagina(descricao, pagina, qtdItens);
     }
 
     @DeleteMapping("/{id}")
