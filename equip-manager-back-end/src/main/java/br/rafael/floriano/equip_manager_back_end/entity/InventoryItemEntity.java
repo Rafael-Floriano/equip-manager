@@ -2,6 +2,8 @@ package br.rafael.floriano.equip_manager_back_end.entity;
 
 import br.rafael.floriano.equip_manager_back_end.enums.Disponibilidade;
 import br.rafael.floriano.equip_manager_back_end.enums.Status;
+import br.rafael.floriano.equip_manager_back_end.mapper.DisponibilidadeConverter;
+import br.rafael.floriano.equip_manager_back_end.mapper.StatusConverter;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.SQLRestriction;
