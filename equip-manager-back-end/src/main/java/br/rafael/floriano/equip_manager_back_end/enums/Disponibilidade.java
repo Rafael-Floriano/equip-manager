@@ -15,4 +15,13 @@ public enum Disponibilidade {
         return valor;
     }
 
+    public static Disponibilidade fromValueToEnum(char value) {
+        if (value == 'D') {
+            return DISPONIVEL;
+        } else if (value == 'I') {
+            return INDISPONIVEL;
+        }
+        throw new IllegalArgumentException("Não foi informado uma disponibilidade compativel");
+    }
+
 }
