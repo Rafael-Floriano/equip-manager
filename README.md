@@ -9,6 +9,39 @@ O **Equip Manager** é uma aplicação web projetada para gerenciar itens de inv
 
 ![image](https://github.com/user-attachments/assets/e282dc79-ed68-4373-b31c-30338da1ef8f)
 
+## Como rodar o projeto
+
+### 1. Levantar a infraestrutura com Docker Compose
+
+Execute o seguinte comando para levantar o PostgreSQL e criar toda a estrutura necessária:
+
+```bash
+docker-compose up
+```
+
+### 2. Rodar o projeto Java
+
+No diretório do seu projeto Java, execute o comando abaixo para iniciar o aplicativo:
+
+```bash
+./mvnw spring-boot:run
+```
+
+### 3. Configurar e rodar o projeto Vue
+
+No diretório do seu projeto Vue, execute os seguintes comandos:
+
+1. Instalar as dependências:
+
+```bash
+npm install
+```
+
+2. Iniciar o servidor de desenvolvimento:
+
+```bash
+npm run serve
+```
 
 ## 💻 Tecnologias Utilizadas
 
