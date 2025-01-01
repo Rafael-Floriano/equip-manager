@@ -80,6 +80,7 @@
 import { defineComponent, PropType } from 'vue';
 import { InventoryItem } from '@/types/pagination.types';
 import { fetchItemByNumeroDeSerie, putItemByNumeroDeSerie } from '@/services/inventoryService';
+import { ItemInventarioDto } from '@/types/item.types';
 
 export default defineComponent({
   props: {
@@ -91,13 +92,18 @@ export default defineComponent({
   data() {
     return {
       editableItem: null as InventoryItem | null,
+      item: null as ItemInventarioDto | null,
       loading: false as boolean,
     };
   },
   methods: {
     async saveChanges() {
       console.log("saveChanges:", this.editableItem);
-      const item:InventoryItem = await putItemByNumeroDeSerie(this.numeroDeSerie, this.editableItem as ItemInventarioDto);
+      
+      const item:InventoryItem = await putItemByNumeroDeSerie(
+        this.numeroDeSerie, 
+        this.editableItem
+      );
       this.$emit('save', item);
       this.close();
     },
