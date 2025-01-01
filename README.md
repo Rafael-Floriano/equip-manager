@@ -5,7 +5,7 @@
 
 ## Descrição
 
-O **Equip Manager** é uma aplicação web projetada para gerenciar itens de inventário de forma simples e eficiente. Com um sistema de CRUD (Criar, Ler, Atualizar, Excluir), os usuários podem facilmente adicionar, listar, editar e remover itens de um inventário. Esta ferramenta é ideal para empresas ou indivíduos que precisam controlar o estoque de produtos ou itens diversos.
+O **Equip Manager** é uma aplicação web projetada para gerenciar itens de inventário de forma simples e eficiente. Com um sistema de CRUD (Criar, Ler, Atualizar, Excluir), os usuários podem facilmente adicionar, listar, editar e remover itens de um inventário.
 
 ## 💻 Tecnologias Utilizadas
 
