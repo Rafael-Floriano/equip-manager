@@ -1,72 +1,63 @@
 <template>
   <div class="modal-overlay" @click.self="close">
     <div class="modal-content">
-      <h2>✏️ Editar Item</h2>
-      
+      <h2>{{ isEditMode() ? "✏️ Editar Item" : "✏️ Cadastrar Item"}}</h2>
       <div class="d-flex justify-content-center align-items-center mt-3">
         <div v-if="loading" class="spinner-border text-primary" role="status"></div>
       </div>
-
-
-      <form v-if="editableItem" @submit.prevent="saveChanges">
+      <form @submit.prevent="saveChanges">
         <div class="form-group">
           <label for="codigoItem">🔢 Código:</label>
           <input 
             type="text" 
             id="codigoItem" 
-            v-model="editableItem.codigoItem" 
+            v-model="item.codigoItem" 
             class="form-control" 
-            readonly
+            :readonly="isEditMode()" 
           />
         </div>
-        
-        <div class="form-group">
+        <div class="form-group" v-if="isEditMode()">
           <label for="numeroDeSerie">🔧 Número de Série:</label>
           <input 
             type="text" 
             id="numeroDeSerie" 
-            v-model="editableItem.numeroDeSerie" 
+            v-model="item.numeroDeSerie" 
             class="form-control"
             readonly
           />
         </div>
-
         <div class="form-group">
           <label for="descricao">📝 Descrição:</label>
           <input 
             type="text" 
             id="descricao" 
-            v-model="editableItem.descricao" 
+            v-model="item.descricao" 
             class="form-control"
           />
         </div>
-
         <div class="form-group">
           <label for="localizacao">📍 Localização:</label>
           <input 
             type="text" 
             id="localizacao" 
-            v-model="editableItem.localizacao" 
+            v-model="item.localizacao" 
             class="form-control"
           />
         </div>
-
-        <div class="form-group">
+        <div class="form-group" v-if="isEditMode()">
           <label for="disponibilidade">📦 Disponibilidade:</label>
-          <select v-model="editableItem.disponibilidade" class="form-control">
+          <select v-model="item.disponibilidade" class="form-control">
             <option :value="'D'">Disponível ✅</option>
             <option :value="'I'">Indisponível ❌</option>
           </select>
         </div>
-
-        <div class="form-group">
+        <div class="form-group" v-if="isEditMode()">
           <label for="status">📊 Status:</label>
-          <select v-model="editableItem.status" class="form-control">
+          <select v-model="item.status" class="form-control">
             <option :value="'A'">Ativo ✅</option>
             <option :value="'I'">Inativo ❌</option>
           </select>
         </div>
-
         <div class="form-group">
           <button type="submit" class="btn btn-success">Salvar alterações</button>
           <button type="button" class="btn btn-secondary" @click="close">Cancelar</button>
@@ -80,7 +71,7 @@
 import { defineComponent, PropType } from 'vue';
 import { InventoryItem } from '@/types/pagination.types';
 import { fetchItemByNumeroDeSerie, putItemByNumeroDeSerie } from '@/services/inventoryService';
-import { ItemInventarioDto } from '@/types/item.types';
+import { AcoesModal } from '@/constants/enums/AcoesModal';
 
 export default defineComponent({
   props: {
@@ -88,32 +79,51 @@ export default defineComponent({
       type: String as PropType<string>,
       required: true,
     },
+    acaoModal: {
+      type: String as PropType<AcoesModal>,
+      required: true,
+    },
   },
   data() {
     return {
-      editableItem: null as InventoryItem | null,
-      item: null as ItemInventarioDto | null,
-      loading: false as boolean,
+      item: {
+      codigoItem: '',
+      numeroDeSerie: '',
+      descricao: '',
+      localizacao: '',
+      disponibilidade: '',
+      status: ''
+    } as InventoryItem,
+    loading: false as boolean,
     };
   },
   methods: {
+    isEditMode(): boolean {
+      return this.acaoModal === AcoesModal.editar;
+    },
     async saveChanges() {
-      console.log("saveChanges:", this.editableItem);
-      
       const item:InventoryItem = await putItemByNumeroDeSerie(
         this.numeroDeSerie, 
-        this.editableItem
+        this.item
       );
       this.$emit('save', item);
       this.close();
     },
     close() {
+      this.item = {
+        codigoItem: '',
+        numeroDeSerie: '',
+        descricao: '',
+        localizacao: '',
+        disponibilidade: '',
+        status: ''
+      };
       this.$emit('close');
     },
     async onModalLoad() {
       this.loading = true;
-      if (this.numeroDeSerie) {
-        this.editableItem = await fetchItemByNumeroDeSerie(this.numeroDeSerie);
+      if (this.numeroDeSerie && this.isEditMode()) {
+        this.item = await fetchItemByNumeroDeSerie(this.numeroDeSerie);
       }
       this.loading = false;
     },
@@ -124,7 +134,7 @@ export default defineComponent({
 });
 </script>
   
-  <style scoped>
+<style scoped>
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -179,5 +189,5 @@ export default defineComponent({
   .btn-secondary {
     margin-left: 10px;
   }
-  </style>
+</style>
   
