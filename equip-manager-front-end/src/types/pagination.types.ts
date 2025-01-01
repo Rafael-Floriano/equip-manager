@@ -5,6 +5,7 @@ export interface InventoryItem {
     status: string;
     descricao: string;
     localizacao: string;
+    dataMovimentacao: string;
 }
   
 export interface Sort {
