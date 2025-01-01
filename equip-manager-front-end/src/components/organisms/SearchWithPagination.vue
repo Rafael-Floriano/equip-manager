@@ -6,14 +6,11 @@
       <div class="flex-grow-1 me-2 mr-3">
         <SearchInput v-model="searchQuery" @input="handleInput" class="w-100" />
       </div>
-      <button 
-        type="button" 
-        class="btn btn-success"
-        @click="showItemModal()">
+      <button type="button" class="btn btn-success" @click="showItemModal()">
         Registrar um novo item
       </button>
     </div>
-    
+
     <table class="table table-striped table-bordered" ref="itemList">
       <thead>
         <tr>
@@ -25,27 +22,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr 
-          v-for="item in filteredItems" 
-          :key="item.codigoItem" 
-          :title="`Ver mais sobre o item: ${item.descricao}`"
+        <tr v-for="item in filteredItems" :key="item.codigoItem" :title="`Ver mais sobre o item: ${item.descricao}`"
           @click="openModal(item)">
           <td>{{ item.codigoItem }}</td>
           <td>{{ item.descricao }}</td>
           <td>{{ showDisponibilidade(item.disponibilidade) }}</td>
           <td>{{ showStatus(item.status) }}</td>
           <td>
-            <button 
-              type="button" 
-              class="btn btn-primary" 
-              @click.stop="editItem(item)" 
+            <button type="button" class="btn btn-primary" @click.stop="editItem(item)"
               :title="`Editar Item: ${item.descricao}`">
               <font-awesome-icon icon="pen" />
             </button>
-            <button 
-              type="button" 
-              class="btn btn-danger" 
-              @click.stop="showdeletarItemConfirmModal(item)"
+            <button type="button" class="btn btn-danger" @click.stop="showdeletarItemConfirmModal(item)"
               :title="`Excluir Item: ${item.descricao}`">
               <font-awesome-icon icon="trash" />
             </button>
@@ -61,27 +49,16 @@
     </div>
   </div>
 
-  <ConfirmationDialog
-      :message="`Deseja realmente excluir o item <strong>${itemToDelete?.descricao}?</strong>`"
-      :isVisible="isDialogVisible"
-      @confirm="confirmDelete"
-      @cancel="cancelDelete"
-    />
+  <ConfirmationDialog :message="`Deseja realmente excluir o item <strong>${itemToDelete?.descricao}?</strong>`"
+    :isVisible="isDialogVisible" @confirm="confirmDelete" @cancel="cancelDelete" />
 
-  <ItemDetailsModal
-    v-if="showModal"
-    :item="selectedItem"
-    @close="closeModal"
-  />
+  <ItemDetailsModal v-if="showModal" :item="selectedItem" @close="closeModal" />
 
-  <ItemModal 
-    v-if="showEditModal" 
-    :numeroDeSerie="selectedItem?.numeroDeSerie"
-    :acaoModal="acaoModal"
-    @close="closeEditModal" 
-    @save="updateItem" 
-  />
-  <ScrollToTopButton/>
+  <ItemModal v-if="showEditModal" :numeroDeSerie="selectedItem?.numeroDeSerie" :acaoModal="acaoModal"
+    @close="closeEditModal" @save="updateItem" />
+  <ScrollToTopButton />
+
+  <AlertMessage v-if="showAlertModal" :mensagem="mensagemDeErro"/>
 </template>
 
 
@@ -97,6 +74,8 @@ import ItemModal from '../molecules/ItemModal.vue';
 import ScrollToTopButton from '../atoms/ScrollToTopButton.vue';
 import $ from 'jquery';
 import { AcoesModal } from '@/constants/enums/AcoesModal';
+import AlertMessage from '../molecules/AlertMessage.vue';
+import { AxiosError } from 'axios';
 export default defineComponent({
   components: {
     SearchInput,
@@ -104,11 +83,12 @@ export default defineComponent({
     ItemDetailsModal,
     ItemModal,
     ScrollToTopButton,
+    AlertMessage,
   },
   data() {
     return {
       searchQuery: '',
-      statusFilter: '', 
+      statusFilter: '',
       items: [] as InventoryItem[],
       currentPage: 0,
       itemsPerPage: 5,
@@ -123,6 +103,8 @@ export default defineComponent({
       qtdItensPorPagina: 12 as number,
       showCreationItemModal: false as Boolean,
       acaoModal: AcoesModal.cadastrar as AcoesModal,
+      mensagemDeErro: '' as string,
+      showAlertModal: false as boolean,
     };
   },
   computed: {
@@ -134,7 +116,7 @@ export default defineComponent({
     },
   },
   methods: {
-    showItemModal():void {
+    showItemModal(): void {
       this.acaoModal = AcoesModal.cadastrar;
       this.showCreationItemModal = true;
       this.showEditModal = true;
@@ -198,7 +180,13 @@ export default defineComponent({
         this.totalItems = response.numberOfElements;
         this.lastPage = response.last;
       } catch (error) {
-        console.error('Erro ao buscar itens do inventário:', error);
+        const axiosError = error as AxiosError;
+        if (axiosError.response && axiosError.response.data) {
+          this.mensagemDeErro = axiosError.response.data;
+        } else {
+          this.mensagemDeErro = 'Ocorreu um erro desconhecido.';
+        }
+        this.showAlertModal = true;
       } finally {
         this.loading = false;
       }
@@ -211,7 +199,13 @@ export default defineComponent({
         this.items = this.items.filter(item => item.numeroDeSerie !== this.itemToDelete?.numeroDeSerie);
         this.items
       } catch (error) {
-        console.error('Erro ao buscar itens do inventário:', error);
+        const axiosError = error as AxiosError;
+        if (axiosError.response && axiosError.response.data) {
+          this.mensagemDeErro = axiosError.response.data;
+        } else {
+          this.mensagemDeErro = 'Ocorreu um erro desconhecido.';
+        }
+        this.showAlertModal = true;
       } finally {
         this.loading = false;
       }
@@ -229,7 +223,7 @@ export default defineComponent({
     },
 
     handleScroll() {
-    const listElement = this.$refs.itemList as HTMLElement;
+      const listElement = this.$refs.itemList as HTMLElement;
       if (listElement) {
         const { scrollTop, scrollHeight, clientHeight } = listElement;
         console.log("handleScroll: ", scrollTop, scrollHeight, clientHeight);
@@ -251,13 +245,13 @@ export default defineComponent({
       }
     },
 
-    showDisponibilidade(disponibilidade:string):string {
+    showDisponibilidade(disponibilidade: string): string {
       if (disponibilidade === 'D') {
         return 'Disponível';
       }
       return 'Indisponível';
     },
-    showStatus(status:string):string {
+    showStatus(status: string): string {
       if (status === 'A') {
         return 'Ativo';
       }
@@ -273,7 +267,7 @@ export default defineComponent({
     $(window).on('resize', function () {
       console.log("Detectado mudança de tamanho de tela, Heigth:", $(window).height());
     });
-},
+  },
   beforeUnmount(): void {
     $(window).off('scroll', this.handleScroll);
     $(window).off('resize');
@@ -281,6 +275,4 @@ export default defineComponent({
 });
 </script>
 
-<style>
-
-</style>
+<style></style>
