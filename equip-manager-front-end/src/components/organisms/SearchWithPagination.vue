@@ -94,6 +94,7 @@ import ConfirmationDialog from '../molecules/ConfirmationDialog.vue';
 import ItemDetailsModal from '../molecules/ItemDetailsModal.vue';
 import EditItemModal from '../molecules/EditItemModal.vue';
 import ScrollToTopButton from '../atoms/ScrollToTopButton.vue';
+import $ from 'jquery';
 
 export default defineComponent({
   components: {
@@ -118,6 +119,7 @@ export default defineComponent({
       selectedItem: null as InventoryItem | null,
       showModal: false,
       showEditModal: false,
+      qtdItensPorPagina: 12 as number,
     };
   },
   computed: {
@@ -258,16 +260,14 @@ export default defineComponent({
   },
   mounted() {
     this.fetchItems();
-    const listElement = this.$refs.itemList as HTMLElement;
-    if (listElement) {
-      window.addEventListener('scroll', this.handleScroll);
-    }
-  },
-  beforeUnmount() {
-    const listElement = this.$refs.itemList as HTMLElement;
-    if (listElement) {
-      window.removeEventListener('scroll', this.handleScroll);
-    }
+    $(window).on('scroll', this.handleScroll);
+    $(window).on('resize', function () {
+      console.log("Detectado mudança de tamanho de tela, Heigth:", $(window).height());
+    });
+},
+  beforeUnmount(): void {
+    $(window).off('scroll', this.handleScroll);
+    $(window).off('resize');
   },
 });
 </script>
